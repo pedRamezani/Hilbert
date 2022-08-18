@@ -67,7 +67,6 @@ void setup() {
   img.loadPixels();
   
   frameRate(15000);
-  delay(15000);
 }
 
 void draw() {
