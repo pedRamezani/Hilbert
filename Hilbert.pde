@@ -12,14 +12,19 @@ private boolean finished = false;
 private PImage img;
 private static final boolean onlyTopRightCorner = true;
 
+private static final boolean skipNodes = false;
+private static final int skipAmount = 2;
+
 void setup() {
-  size(500, 500);
-  background(255);
   surface.setTitle("Hilbert");
   surface.setResizable(true);
+ 
   int newSize = floor(min(displayWidth, displayHeight) * 0.8);
   surface.setSize(newSize, newSize);
   surface.setLocation((displayWidth - width)/2, (displayHeight - height)/2);
+  
+  //size(500, 500);
+  background(255);
   
   renameRules.set("A","0");
   renameRules.set("B","1");
@@ -35,11 +40,16 @@ void setup() {
       drawRule = drawRule.replaceAll(key, productionRules.get(key));
     }
   }
+  
+  for (String key : renameRules.keys()) {
+    drawRule = drawRule.replace(key, "");
+  }
+  drawRule = drawRule.replace("+-", "");
+  drawRule = drawRule.replace("-+", "");
   println(drawRule);
   
   float lineLength = width * pow(2, -iteration);
   strokeWidth = max(lineLength/2, 1);
-  //strokeWeight(strokeWidth);
   
   PVector p = new PVector(lineLength/2, lineLength/2);
   PVector v = new PVector(lineLength,0);
@@ -73,7 +83,13 @@ void draw() {
   //shape(hilbert);
   if (lerp < lerpStep && currentVertex < hilbert.getVertexCount() - 1) {
     v.set(hilbert.getVertex(currentVertex));
-    w.set(hilbert.getVertex(++currentVertex));
+    if (skipNodes){
+      currentVertex += skipAmount;
+      currentVertex %= hilbert.getVertexCount();
+      w.set(hilbert.getVertex(currentVertex));
+    } else {
+      w.set(hilbert.getVertex(++currentVertex));
+    }
   } else if (lerp < lerpStep && currentVertex == hilbert.getVertexCount() - 1) {
     v.set(w); 
     finished = true;
